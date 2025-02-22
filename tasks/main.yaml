@@ -1,0 +1,22 @@
+---
+- name: change root password
+  user:
+    name: root
+    update_password: always
+    password: "{{ root_password |password_hash('sha512') }}"
+
+- name: change ansible user password
+  user:
+    name: "{{ ansible_user }}"
+    update_password: always
+    password: "{{ ansible_password |password_hash('sha512') }}"
+
+- name: use new ansible password to reboot
+  set_fact:
+    ansible_become_pass: "{{ ansible_password }}"
+
+- name: reboot for network changes
+  reboot:
+    msg: "Rebooting to apply changes"
+    pre_reboot_delay: 60
+    post_reboot_delay: 240
